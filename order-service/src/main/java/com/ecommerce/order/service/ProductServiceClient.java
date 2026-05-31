@@ -17,12 +17,12 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @RequiredArgsConstructor
 public class ProductServiceClient {
 
-    private final WebClient productServiceClient;
+    private final WebClient productServiceWebClient;
 
     public ProductDTO getProduct(String productId) {
         log.debug("Fetching product details for ID: {}", productId);
         try {
-            return productServiceClient.get()
+            return productServiceWebClient.get()
                     .uri("/products/{id}", productId)
                     .retrieve()
                     .bodyToMono(ProductDTO.class)
@@ -39,7 +39,7 @@ public class ProductServiceClient {
     public boolean checkAvailability(String productId, int quantity) {
         log.debug("Checking availability for product {}: quantity {}", productId, quantity);
         try {
-            Boolean available = productServiceClient.get()
+            Boolean available = productServiceWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/products/{id}/availability")
                             .queryParam("quantity", quantity)
@@ -57,7 +57,7 @@ public class ProductServiceClient {
     public void reduceStock(String productId, int quantity) {
         log.debug("Reducing stock for product {}: quantity {}", productId, quantity);
         try {
-            productServiceClient.post()
+            productServiceWebClient.post()
                     .uri("/products/inventory/reduce")
                     .bodyValue(new InventoryRequest(productId, quantity))
                     .retrieve()
