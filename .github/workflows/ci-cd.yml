@@ -53,6 +53,9 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
     strategy:
       matrix:
         service:
@@ -68,7 +71,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set image prefix to lowercase
-        run: echo "IMAGE_PREFIX_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')/ecommerce" >> $GITHUB_ENV
+        run: echo "IMAGE_PREFIX_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -86,8 +89,8 @@ jobs:
           context: ./${{ matrix.service }}
           push: true
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX_LC }}/${{ matrix.service }}:latest
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX_LC }}/${{ matrix.service }}:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX_LC }}/ecommerce-${{ matrix.service }}:latest
+            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX_LC }}/ecommerce-${{ matrix.service }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
